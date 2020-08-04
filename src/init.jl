@@ -1,9 +1,7 @@
-using DrWatson
-#run when someone sends you this project to set all paths and dependencies
+using DrWatson #no use doing this, before we can include this it had to be defined
+#run when starting Julia project to set all paths and dependencies
 quickactivate("D:/gits/datascience1", "datascience1")
-import Pluto
-Pluto.run(8980) #the port on which you find it
-using HTTP,  CSV, JuMP, Plots, GadFly,
+using   CSV, JuMP, Plots, #GadFly,HTTP,
             DataFrames, DataFramesMeta, TimeSeries
 
 #= DataFrameMeta defines:

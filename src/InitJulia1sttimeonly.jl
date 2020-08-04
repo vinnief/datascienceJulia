@@ -3,7 +3,7 @@ using Pkg
 Pkg.add("JuMP")
 #Pkg.add("Juliamusic") ; using JuliaMusic
 Pkg.add("Plots")
-Pkg.add("GadFly")  #ggplot like plots
+#Pkg.add("GadFly")  #ggplot like plots
 Pkg.add("CSV"); Pkg.add("HTTP") #Pkg.add("Requests")  #deprecated? not needed if you have HTTP and or CSV?
 Pkg.add("Pluto")
 Pkg.add("TimeSeries")

@@ -1,47 +1,73 @@
-include(srcdir("init.jl"))# ECDC plots
-LAGRC = 42
+# ECDC plots
+using DrWatson
+include(srcdir("init.jl")) #does not work without using Dr Watson forst!
+
+LAGRC = 42  #max time to recovery for Covid19 apparently #:dateRep => "Date",
 makeECDC = function( )
     #res = HTTP.get("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
     #return((res.body)  # retuns one column of Ints   #|> DataFrame )
+    res = CSV.read(download("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"),DataFrame)
     #using CSV:
-    res=CSV.read(download("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv"),DataFrame)
         #fileEncoding  = "UTF-8-BOM"
-        #CSV.read returns a DataFrame
-    #using Requests
+    DataFrames.rename!(res, Dict(:countriesAndTerritories => "PSCR",
+                        :countryterritoryCode    => "ISOcode",
+                        :cases  => "confirmed_today",
+                        :deaths => "deaths_today",
+                        :popData2019 => "population",
+                        :continentExp => "Region")
+            )
+    #res.thedate::Date
+    dformat = Dates.DateFormat("dd/mm/yyyy")
+    res = @transform(res, thedate = Date.(:dateRep, dformat))
+    #res.thedate =  Date(res.dateRep, "dd/mm/yyyy")
+    res = @orderby(res,:PSCR, :thedate)
     return(res) # a many x 12 DF
-    #get("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
-    #then like http.get need to exttract the body
     #using urldownload
     #urldownload("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
-
 end
 
 ECDC = makeECDC()
-ECDC1 = rename(ECDC, Dict(:countriesAndTerritories => "PSCR",
-                :countryterritoryCode    => "ISOcode",
-                :cases  => "confirmed_today",
-                :deaths => "deaths_today",
-                :dateRep => "Date",
-                :popData2019 => "population",
-                :continentExp => "Region")
-                ) #|> groupby(:PSCR)
-names(ECDC1)
-ECDC.dateRep[1]
-ECDC1.day
-ECDC1.Date[1]
-ECDC2 = groupby(ECDC1,"PSCR")
+ECDC.dateRep[1:10]
+names(ECDC)
+ECDC.day[1:10]
+ECDC.thedate[1:10]
+ECDC.thedate[length(ECDC.thedate)]
+ECDC[length(ECDC.thedate),:].thedate
+ECDC[length(ECDC.thedate),:PSCR]
+ECDC[1,:PSCR]
+ECDC.PSCR[1]
+tail = function(df::DataFrame; nrrowstoprint::Int32 = 6)
+    nrrows = nrow(df)
+    print(df[nrrows-nrrowstoprint+1:nrrows,:])
+end
+tail(ECDC)
+typeof(ECDC)
+ECDC2 = DataFrames.groupby(ECDC,"PSCR")
+#ECDC2 = @orderby(ECDC2,:PSCR, :Date)
+ECDC2 =  @transform(ECDC2, confirmed = cumsum(:confirmed_today) ,
+                    deaths = cumsum(:deaths_today))
+ECDC2 = DataFrames.groupby(ECDC2,"PSCR")
+VF_lag = function(v::Array{T,1} where T<:Any; delay::Int64 = 1)
+    delay >= 0 ? [ [NaN for n in 1:delay],   vec[1:(length(vec)-delay)] ] :
+                [ vec[(1 - delay) : length(vec), [NaN for n in 1:-delay] ] ]
+end
+#names(ECDC2)
+combine(ECDC2, :confirmed => VF_lag => "recovered" ,ungroup = false)
+print(ECDC2[1:400,[:confirmed_today,:confirmed,:PSCR]])
+ECDC3 = TimeArray(ECDC2, timestamp = :thedate)
 addvars = function(lpti::DataFrame)
     lpti = groupby(lpti,"PSCR")
     lpti = @transform(lpti, confirmed = cumsum(:confirmed_today) ,
         deaths = cumsum(:deaths_today) )#,    recovered = Int64(0) )
-    lpti = @orderby(lpti, :Date)
-    lpti.recovered = missing
+    #lpti = @orderby(lpti, :Date)
+    #lpti.recovered = missing
+    lpti[!,"recovered"] = missing
     #@transform(lpti, recovered_imputed = lag(:confirmed,LAGRC)
-    lpti.recovered_imputed = lag(lpti.confirmed,LAGRC)
+    lpti.recovered_imputed = lag.(lpti.confirmed,LAGRC, padding = true) #lag(cl[1:3], padding=true)
     lpti.active_imputed = lpti.confirmed - lpti.recovered_imputed - lpti.deaths
     lpti
 end
-ECDC3 = addvars(ECDC1)
+ECDC3 = addvars(ECDC)
 ECDC2 = @transform(ECDC2, confirmed = cumsum(:confirmed_today) ,
     deaths = cumsum(:deaths_today) )#,    recovered = Int64(0) )
 names(ECDC2)
