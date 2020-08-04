@@ -1,5 +1,5 @@
-This is an awesome new scientific project that uses `DrWatson`!
+This is a scientific project that uses `DrWatson` package!
 
-trying to read data from the web.
-then plot it.
-testing on Covid19 ECDC data
+1) read data from the web.
+2) plot it.
+3) data: Covid19 ECDC data

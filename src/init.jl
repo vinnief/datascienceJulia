@@ -1,17 +1,12 @@
 using DrWatson
-#run when setting up project first time: create empty project
-initialize_project("D:/gits/datascience1" , "datascience1")
-#run when someone sends you this project.
+#run when someone sends you this project to set all paths and dependencies
 quickactivate("D:/gits/datascience1", "datascience1")
-using Pkg
-Pkg.add("JuMP")
-Pkg.add("Juliamusic") ; using JuliaMusic
-Pkg.add("Plots")
-Pkg.add("CSV"); Pkg.add("HTTP") #Pkg.add("Requests")  #deprecated? not needed if you have HTTP and or CSV?
+import Pluto
+Pluto.run(8980) #the port on which you find it
+using HTTP,  CSV, JuMP, Plots, GadFly,
+            DataFrames, DataFramesMeta, TimeSeries
 
-Pkg.add("DataFrames")
-Pkg.add("DataFramesMeta")
-#=
+#= DataFrameMeta defines:
     Julia             dplyr            LINQ
     ---------------------------------------------
     @where            filter           Where
@@ -23,7 +18,8 @@ Pkg.add("DataFramesMeta")
     @select           select           Select
     where(g, d -> mean(d[:a]) > 0) and @where(g, mean(:a) > 0)
     -- Filter groups based on the given criteria. Returns a GroupedDataFrame.
-    orderby(g, d -> mean(d[:a])) and @orderby(g, mean(:a))
+    orderby(g, d -> mean(d[:a]))# and
+    @orderby(g, mean(:a))
     -- Sort groups based on the given criteria. Returns a GroupedDataFrame.
     DataFrame(g)
     -- Convert groups back to a DataFrame with the same group orderings.
@@ -41,5 +37,21 @@ Pkg.add("DataFramesMeta")
     combine(gd::GroupedDataFrame, args...; keepkeys::Bool=true, ungroup::Bool=true)
     Apply operations to each group in a GroupedDataFrame and return the combined result as a DataFrame if ungroup=true or GroupedDataFrame if
   ungroup=false.
+ =#
+
+ #=other useful packages
+ QuantEcon : Quantitative Economics functions for Julia.
+2. Plots : easy plots.
+3. PyPlot : plotting for Julia based on matplotlib.pyplot.
+4. Gadfly : another plotting package; it follows Hadley Wickhams’s ggplot2 for R and the
+ideas of Wilkinson (2005).
+5. Distributions : probability distributions and associated functions.
+6. DataFrames : to work with tabular data.
+7. Pandas : a front-end to work with Python’s Pandas.
+8. TensorFlow : a Julia wrapper for TensorFlow.
+Several packages facilitate the interaction of Julia with other common programming
+languages. Among those, we can highlight:
+1. Pycall : call Python functions.
+2. JavaCall : call Java from Julia.
+3. RCall: call R from Julia.
 =#
-using HTTP, DataFrames, CSV, JuMP, Plots, DataFramesMeta

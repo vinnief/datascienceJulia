@@ -173,6 +173,9 @@ git-tree-sha1 = "f354b2087a3b01c1d7152c19f45886c8a036fa5e"
 uuid = "5789e2e9-d7fb-5bc7-8068-2c6fae9b9549"
 version = "1.4.0"
 
+[[FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+
 [[FixedPointNumbers]]
 deps = ["Statistics"]
 git-tree-sha1 = "335bfdceacc84c5cdf16aadc768aa5ddfc5383cc"
@@ -403,6 +406,12 @@ deps = ["Base64", "Contour", "Dates", "FFMPEG", "FixedPointNumbers", "GR", "Geom
 git-tree-sha1 = "f80ce6a2c0342b658d752d1396fad34142df6a05"
 uuid = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 version = "1.5.7"
+
+[[Pluto]]
+deps = ["Base64", "Distributed", "HTTP", "InteractiveUtils", "JSON", "Markdown", "Pkg", "REPL", "Sockets", "UUIDs"]
+git-tree-sha1 = "5628b6889a555d8568d7e51ff3efa8fc056a20e1"
+uuid = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+version = "0.11.1"
 
 [[PooledArrays]]
 deps = ["DataAPI"]

@@ -1,4 +1,5 @@
-# ECDC plots
+include(srcdir("init.jl"))# ECDC plots
+LAGRC = 42
 makeECDC = function( )
     #res = HTTP.get("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
     #return((res.body)  # retuns one column of Ints   #|> DataFrame )
@@ -29,6 +30,18 @@ ECDC.dateRep[1]
 ECDC1.day
 ECDC1.Date[1]
 ECDC2 = groupby(ECDC1,"PSCR")
+addvars = function(lpti::DataFrame)
+    lpti = groupby(lpti,"PSCR")
+    lpti = @transform(lpti, confirmed = cumsum(:confirmed_today) ,
+        deaths = cumsum(:deaths_today) )#,    recovered = Int64(0) )
+    lpti = @orderby(lpti, :Date)
+    lpti.recovered = missing
+    #@transform(lpti, recovered_imputed = lag(:confirmed,LAGRC)
+    lpti.recovered_imputed = lag(lpti.confirmed,LAGRC)
+    lpti.active_imputed = lpti.confirmed - lpti.recovered_imputed - lpti.deaths
+    lpti
+end
+ECDC3 = addvars(ECDC1)
 ECDC2 = @transform(ECDC2, confirmed = cumsum(:confirmed_today) ,
     deaths = cumsum(:deaths_today) )#,    recovered = Int64(0) )
 names(ECDC2)
@@ -38,7 +51,10 @@ select(ECDC2, :Date => first => :mindate)
 
 B = @where(ECDC2, :PSCR .== "Belgium")
 scatter(B.Date, B.deaths, label = "deaths")
-scatter(B.Date, B.confirmed, label = "confirmed")
+ylabel!("deaths")
+scatter(B.Date, B.confirmed, label = "confirmed", ylabel="conf", xlabel = "Date", color = "red")
+scatter(B.Date, B.confirmed, label = "confirmed", ylabel="conf", xlabel = "Date", color = "red")
+ylabel!("confirmed")
 p = scatter(B.Date, B.deaths, label = "deaths")
 log
 yaxis!(p,log2)
