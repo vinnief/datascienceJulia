@@ -2,7 +2,7 @@ using DrWatson #no use doing this, before we can include this it had to be defin
 #run when starting Julia project to set all paths and dependencies
 quickactivate("D:/gits/datascience1", "datascience1")
 using   CSV, JuMP, Plots, #GadFly,HTTP,
-            DataFrames, DataFramesMeta, TimeSeries
+            DataFrames, DataFramesMeta, TimeSeries, SplitApplyCombine
 
 #= DataFrameMeta defines:
     Julia             dplyr            LINQ
@@ -19,10 +19,13 @@ using   CSV, JuMP, Plots, #GadFly,HTTP,
     orderby(g, d -> mean(d[:a]))# and
     @orderby(g, mean(:a))
     -- Sort groups based on the given criteria. Returns a GroupedDataFrame.
+
     DataFrame(g)
     -- Convert groups back to a DataFrame with the same group orderings.
+
     @based_on(g, z = mean(:a))
     -- Summarize results within groups. Returns a DataFrame.
+
     transform(g, d -> y = d[:a] - mean(d[:a])) and @transform(g, y = :a - mean(:a))
     -- Transform a DataFrame based on operations within a group. Returns a DataFrame.
 

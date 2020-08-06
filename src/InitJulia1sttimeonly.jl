@@ -7,8 +7,10 @@ Pkg.add("Plots")
 Pkg.add("CSV"); Pkg.add("HTTP") #Pkg.add("Requests")  #deprecated? not needed if you have HTTP and or CSV?
 Pkg.add("Pluto")
 Pkg.add("TimeSeries")
+Pkg.add("SplitApplyCombine")
 Pkg.add("DataFrames")
 Pkg.add("DataFramesMeta")
+
 #= ======= useful packages
 QuantEcon : Quantitative Economics functions for Julia.
 2. Plots : easy plots.
