@@ -1,8 +1,27 @@
-using DrWatson #no use doing this, before we can include this it had to be defined
+#using DrWatson
 #run when starting Julia project to set all paths and dependencies
 quickactivate("D:/gits/datascience1", "datascience1")
-using   CSV, JuMP, Plots, #GadFly,HTTP,
-            DataFrames, DataFramesMeta, TimeSeries, SplitApplyCombine
+#DrWatson.greet()
+#print("Don't forget to quickactivate your project")
+#using OhMyREPL # is in startup.jl  check!
+paste = function(a ; sep=",")
+       reduce(*,map(x-> x*sep, a[1:(end-1)]))*a[end]
+       end
+a =  x-> paste(x, sep="")
+tryusing = function(package)
+    try
+        @eval using package
+            catch e
+        @warn "error while importing " * string(package) e
+    end
+end  ### does not work. copied from OhMYREPL web page
+#tryusing( CSV)
+using   CSV, HTTP, JuMP, Plots, StatsPlots , LaTeXStrings, JLD, DataFrames, DataFramesMeta, TimeSeries, SplitApplyCombine, Statistics    #GadFly,
+
+notebookdir = function() joinpath(projectdir(),"notebooks") end
+notebookdir = function(args...)   joinpath(projectdir(),"notebooks",args...) end
+
+#notebook(dir = notebookdir()) #starts Jupyter in that directory.
 
 #= DataFrameMeta defines:
     Julia             dplyr            LINQ
@@ -54,5 +73,5 @@ Several packages facilitate the interaction of Julia with other common programmi
 languages. Among those, we can highlight:
 1. Pycall : call Python functions.
 2. JavaCall : call Java from Julia.
-3. RCall: call R from Julia.
+3. RCall: call R from Julia. JuliaCall does the reverse in R
 =#
