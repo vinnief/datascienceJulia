@@ -1,6 +1,6 @@
 #using DrWatson
 #run when starting Julia project to set all paths and dependencies
-quickactivate("D:/gits/datascience1", "datascience1")
+quickactivate("D:/gits/datascienceJulia", "datascience1")
 #DrWatson.greet()
 #print("Don't forget to quickactivate your project")
 #using OhMyREPL # is in startup.jl  check!

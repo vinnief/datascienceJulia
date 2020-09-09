@@ -122,7 +122,7 @@ graphit = function( countries= ["Belgium","Netherlands"]; gdf = ECDC2,
     yvars=[:active, :deaths], xvar="thedate",plotfn::Function =plot!,
     ytrafo = false, seriestype = :scatter, facet = false, kwargs...)
     yaxtrafo = makeInvTrafo(ytrafo)
-    shapes = [:octagon,:heptagon,:hexagon ,:pentagon, :square,:diamond,:circ,
+    shapes = [:octagon,:heptagon,:hexagon ,:pentagon, :square,:triangle, :diamond,:circ,
         :star,:star6,:star7,:star8]
     strokecolors = [:red,:blue,:cyan,:darkgreen,:lawngreen,:pink,:purple,
             :magenta,:darkblue,:orange, :yellow]
