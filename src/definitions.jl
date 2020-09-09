@@ -122,6 +122,8 @@ makeInvTrafo = function(trafo)
     else println(trafo ,"'s inverse unknown. Y-axis may need adjusting");axtrafo=identity
     end
 end
+
+#Plots.supported_markers()
 graphit = function( countries= ["Belgium","Netherlands"]; gdf = ECDC2,
     yvars=[:active, :deaths], xvar="thedate",plotfn::Function =plot!,
     ytrafo = false, seriestype = :scatter, facet = false, kwargs...)

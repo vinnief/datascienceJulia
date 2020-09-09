@@ -47,7 +47,7 @@ graphit(["Belgium", "Netherlands"], yvars = ["active"])
 graphit(["Belgium", "Netherlands"], yvars = ["active"], plotfn = areaplot!)
 graphit(["Belgium"],  yvars = [:confirmed_today, :net_active], plotfn = plot!, ytrafo = identity, seriestype = :line)# xvar = :confirmed_today,
 graphit(
-    ["Germany", "Belgium", "France", "Spain", "United_Kingdom", "Chile"],
+    [ "Chile", "Spain", "France",  "Belgium","Netherlands","Italy",  "United_Kingdom","Germany"],
     yvars = [:active_p_M],
     xvar = "thedate",
 )
@@ -68,19 +68,14 @@ graphit(     [ "Spain", "United_Kingdom", "Italy", "France",
     yvars = ["active"],
 )
 
-graphit(
-    [
-        "Spain",
-        "United_Kingdom",
-        "Italy",
-        "France",
-        "Germany",
-        "Belgium",
-        "China",
-        "Netherlands",
-        "Poland",
-        "Denmark",
-        "Luxembourg",
-    ],
+graphit(     ["Spain","United_Kingdom", "Italy", "France",
+        "Germany", "Belgium", "China", "Netherlands", "Poland",
+        "Denmark", "Luxembourg"],
     yvars = ["recovered"],
 )
+graphit(
+    [ "Chile", "Spain", "France",  "Belgium","Netherlands","Italy",  "United_Kingdom","Germany"],
+    yvars = [:confirmed_rate],
+    xvar = "thedate",
+)
+plot!(ECDC2[countryIndex("Belgium")].thedate, repeat([.023],length(ECDC2[countryIndex("Belgium")].thedate)), label = "stable rep rate")
