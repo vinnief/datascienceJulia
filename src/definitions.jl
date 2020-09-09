@@ -43,28 +43,30 @@ VF_lag = function(veccy::Array{T,1} where T<: Any, delay = 1; padding = missing)
     end
 end
 fracsafe = function(a,b)
-    b == 0 ? missing : a/b
+     (ismissing(b) || b == 0) ? missing : a/b
 end
 # timeArrays.lag works using the dates, but we cannot convert a grouped dataframe to a timearray.
 GroupedTimeArray = Array{TimeArray}
-addvars = function(lpti::DataFrame)
-    lpti[:,:confirmed] .= 0
-    lpti[:,:deaths] .= 0
-    lpti[:,:recovered].=0
-    lpti[:,:active] .= 0
-    lpti[!,:net_active] .= 0 #
-    lpti[!,:confirmed_rate] .= 0.0
-    allowmissing!(lpti, [:active,:recovered,:net_active, :confirmed_rate])#
-    lpti = groupby(lpti,"PSCR")
-    for country = Base.OneTo(length(lpti))
-        lpti[country][:,:confirmed] .= cumsum(lpti[country][:,:confirmed_today])
-        lpti[country][:,:deaths]    .= cumsum(lpti[country][:,:deaths_today])
-        lpti[country][:,:recovered]     .= VF_lag(lpti[country][:,:confirmed]-lpti[country][:,:deaths], LAGRC,padding = 0)
-        lpti[country][:,:active]    .= lpti[country][:,:confirmed] .- lpti[country].deaths .- lpti[country].recovered
-        lpti[country][:,:net_active].= lpti[country][:,:active] .- VF_lag(lpti[country][:,:active],1,padding=0)
-        lpti[country][:,:confirmed_rate].= fracsafe.(lpti[country][:,:confirmed_today] , lpti[country][:,:active])
+addvarsnGroup = function(lpdf::DataFrame)
+    lpdf[:,:confirmed] .= 0
+    lpdf[:,:deaths] .= 0
+    lpdf[:,:recovered].=0
+    lpdf[:,:active] .= 0
+    lpdf[!,:net_active] .= 0 #
+    lpdf[!,:confirmed_rate] .= 0.0
+    lpdf[!,:active_p_M] .= 0.0
+    allowmissing!(lpdf, [:active, :active_p_M, :recovered,:net_active, :confirmed_rate])#
+    gdf = groupby(lpdf,"PSCR")
+    for country = Base.OneTo(length(gdf))
+        gdf[country][:,:confirmed] .= cumsum(gdf[country][:,:confirmed_today])
+        gdf[country][:,:deaths]    .= cumsum(gdf[country][:,:deaths_today])
+        gdf[country][:,:recovered]     .= VF_lag(gdf[country][:,:confirmed]-gdf[country][:,:deaths], LAGRC,padding = 0)
+        gdf[country][:,:active]    .= gdf[country][:,:confirmed] .- gdf[country].deaths .- gdf[country].recovered
+        gdf[country][:,:net_active].= gdf[country][:,:active] .- VF_lag(gdf[country][:,:active],1,padding=0)
+        gdf[country][:,:confirmed_rate].= fracsafe.(gdf[country][:,:confirmed_today] , gdf[country][:,:active])
+        gdf[country][:,:active_p_M] .= fracsafe.(gdf[country][:,:active], gdf[country][:,:population]).*1e6
     end
-    lpti
+    gdf
 end
 addVars1Country = function(df)
     df[:,:confirmed] .= cumsum(df[:,:confirmed_today])
@@ -73,6 +75,7 @@ addVars1Country = function(df)
     df[:,:active]    = df[:,:confirmed] - df.deaths - df.recovered
     df[:,:net_active].= df[:,:active] - VF_lag(df[:,:active],1,padding=0)
     df[:,:confirmed_rate].= fracsafe.(df[:,:confirmed_today] , df[:,:active])
+    df[:,:active_p_M] .= fracsafe.(df[:,:active], df[:,:population]).*1e6
     df
 end
 addVarsAllCountries = function(lpdf::DataFrame; ungroup = true)
@@ -82,7 +85,8 @@ addVarsAllCountries = function(lpdf::DataFrame; ungroup = true)
     lpdf[:,:active] .= 0
     lpdf[!,:net_active] .= 0 #
     lpdf[!,:confirmed_rate] .= 0.0#
-    allowmissing!(lpdf, [:active,:recovered,:net_active,:confirmed_rate])#
+    lpdf[!,:active_p_M] .= 0.0
+    allowmissing!(lpdf, [:active,:active_p_M,:recovered,:net_active,:confirmed_rate])#
     gdf = groupby(lpdf,"PSCR")
     res = combine(addVars1Country, gdf,ungroup = ungroup)
     res
@@ -122,8 +126,8 @@ graphit = function( countries= ["Belgium","Netherlands"]; gdf = ECDC2,
     yvars=[:active, :deaths], xvar="thedate",plotfn::Function =plot!,
     ytrafo = false, seriestype = :scatter, facet = false, kwargs...)
     yaxtrafo = makeInvTrafo(ytrafo)
-    shapes = [:octagon,:heptagon,:hexagon ,:pentagon, :square,:triangle, :diamond,:circ,
-        :star,:star6,:star7,:star8]
+    shapes = [:octagon,:heptagon,:hexagon ,:pentagon, :square,:utriangle,:rtriangle,
+     :diamond,:circ, :star,:star6,:star7,:star8]
     strokecolors = [:red,:blue,:cyan,:darkgreen,:lawngreen,:pink,:purple,
             :magenta,:darkblue,:orange, :yellow]
     length(countries)<= min(length(shapes),length(strokecolors))  ||
